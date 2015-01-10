@@ -5,7 +5,8 @@ Created on Jan 7, 2015
 '''
 #
 from glob import glob
-from config import Config
+from pywxfades.config import Config
+from pywxfades.manageData import inventory
 #
 import os
 #
@@ -18,12 +19,7 @@ def get_date_input(config):
     Outputs:
         selection <string> The selected date.
     """
-    # Find items living in the grib storage directory and list them.
-    raw_glob = glob(Config.GRIB_STORAGE_PATH + '/*')
-    # Loop over all items living in the grib storage directory and add the name
-    #  of the directory without its path if the item is a directory (Linux 
-    #  Only!).
-    available_dates = [i.split('/')[-1] for i in raw_glob if os.path.isdir(i)]
+    available_dates = inventory.get_available_dates()
     # Create a menu from the available dates options defined above and get user
     #  input. User input will be returned as an index to one of the options.
     option_index = menu(available_dates)
@@ -39,12 +35,7 @@ def get_efs_input(config):
     Outputs:
         selection <string> The selected forecast system.
     """
-    # Find items living in the grib storage directory, in the previously
-    #  selected date sub-directory.
-    raw_glob = glob(Config.GRIB_STORAGE_PATH + '/' + config.model_init_date + '/*')
-    # Loop over items and add to a new list if the item is a directory.
-    #  Grabs directory name without its path (Linux Only!).
-    available_efs_systems = [i.split('/')[-1] for i in raw_glob if os.path.isdir(i)]
+    available_efs_systems = inventory.get_available_efs_systems(config.model_init_date)
     # Get user input and return selected option.
     option_index = menu(available_efs_systems)
     return available_efs_systems[option_index]
@@ -59,12 +50,7 @@ def get_hour_input(config):
     Outputs:
         selection <string> The selected initialization time.
     """
-    # Find items living the grib storage directory, selected date sub-directory,
-    #  selected EFS system sub-directory.
-    raw_glob = glob(Config.GRIB_STORAGE_PATH + '/' + config.model_init_date + '/' + config.forecast_system + '/*')
-    # Loop over items and add to a new list if the item is a directory.
-    #  Grabs directory name without its path (Linux Only!).
-    available_hours = [i.split('/')[-1] for i in raw_glob if os.path.isdir(i)]
+    available_hours = inventory.get_available_hours(config.model_init_date, config.forecast_system)
     # Get user input and return selected option.
     option_index = menu(available_hours)
     return available_hours[option_index]

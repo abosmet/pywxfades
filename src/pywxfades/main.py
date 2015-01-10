@@ -4,12 +4,11 @@ Created on Jan 7, 2015
 
 @author: Joel
 '''
-# From imports
-from config import Config
+# Local package imports
+from pywxfades.config import Config
+from pywxfades import ui
 # Standard library imports
 import sys
-# Native package imports
-import ui
 # Begin module code
 def main():
     """
@@ -160,3 +159,8 @@ def user_interface(config):
 if __name__ == '__main__':
     main()
     print 'PYTHON STOP'
+#
+#
+#
+#
+# EOF
