@@ -6,10 +6,42 @@ Created on Jan 7, 2015
 '''
 # Local package imports
 from pywxfades.config import Config
+from pywxfades.manageData import inventory
+from pywxfades.modelData import ModelData
+from pywxfades.stationData import StationData
 from pywxfades import ui
 # Standard library imports
 import sys
 # Begin module code
+def gen_model_data_objects(config):
+    """
+    Creates ModelData objects from a list of grib files.
+    """
+    files = inventory.get_data_file_list(config.model_init_date,config.forecast_system,config.model_init_hour)
+    for file_ in files:
+        ModelData(file_)
+    return
+#
+def gen_station_data_objects(config):
+    """
+    Reads the stations data file and creates StationData objects for all
+     listed stations. Stations data file is formatted as the following:
+     <latitude> <longitude> <station name>\n
+    """
+    # Open the stations data file for the duration of this task.
+    with open(Config.STATIONS_DATA_STORAGE_PATH + '/' + config.stations_data_file_name,'r') as f:
+        # Loop over all lines in the stations data file.
+        for lines in f:
+            # Remove newline and EOF sigils.
+            line = lines.strip('\n\r')
+            # Split on whitespace and set local variables.
+            (lat,lon,name) = line.split()
+            # Create a StationData object.
+            StationData(float(lat),float(lon),name)
+            if config.test:
+                print 'New station created! Name: %s Lat: %s Lon: %s' % (name,lat,lon)
+    return
+#
 def main():
     """
     Entry point of program.
@@ -24,6 +56,12 @@ def main():
     #  subcommand to determine how to continue. Upon exiting the if block, this
     #  process assumes that config is set and continues.
     parse_arguments(config)
+    # Expand the configuration.
+    config.expand()
+    # Create ModelData objects.
+    gen_model_data_objects(config)
+    # Create StationData objects.
+    gen_station_data_objects(config)
     # TODO: To Be Continued...
     return
 #

@@ -3,29 +3,66 @@ Created on Jan 7, 2015
 
 @author: Joel
 '''
-#
+# Local package from imports
 from pywxfades.manageData import inventory
-#
+# Standard library from imports
+from datetime import datetime
+# Standard library imports
 import os
 import re
 #
 class Config:
     """
     Class to hold runtime configuration settings.
+    Instance Variables:
+     model_init_date <string>
+       Initialization date of the model in use in the form: YYYYMMDD
+     forecast_system <string>
+       Lower-case forecast system in use, probably sref or gefs
+     model_init_hour <string>
+       Initialization hour of the model in use in the form HH
+     stations_data_file_name <string>
+       File name of the stations data file without path.
+     grib_path <string>
+       Path to storage directory for the model date and time in use.
+     model_fcst_interval <int>
+       Time between individual forecasts from the model in use in hours.
+     model_fcst_length <int>
+       Forecast hour of the final forecast in the model run.
+     num_forecasts <int>
+       Total number of forecasts in the data set.
+     data_types <list>
+       Grib shortname of all relevant data to be pulled from grib files. This
+        needs to be changed for expansion to other pressure levels.
+     model_init_dt <datetime>
+       Datetime object representing the initialization time of the model in use.
+     test <bool>
+       Activate test mode for verbose output in certain situations.
     """
     GRIB_STORAGE_PATH = '../../GRIB'
     STATIONS_DATA_STORAGE_PATH = '../../config'
     DEFAULT_STATIONS_DATA_FILE_NAME = 'paStations.dat'
+    TEST_MODE = False
     #
     def __init__(self, params):
         """
         Config may be instantiated without setting any fields. This is designed
          to be configured in stages depending on user input (or lack thereof).
         """
+        # Instance variable definitions. These will be assigned later.
+        # Basic variables
         self.model_init_date = None
         self.forecast_system = None
         self.model_init_hour = None
         self.stations_data_file_name = None
+        # Expanded variables
+        self.grib_path = None
+        self.model_fcst_interval = None
+        self.model_fcst_length = None
+        self.num_forecasts = None
+        self.data_types = ['csnow','crain','cicep','cfrzr','tp'] # This could change!
+        self.model_init_dt = None
+        self.test = Config.TEST_MODE
         return
     #
     def set_default_forecast_system(self):
@@ -81,7 +118,28 @@ class Config:
         return
     #
     def expand(self):
-        pass
+        """
+        Expand instance variables which require the basic configuration to be
+         set before being created.
+        """
+        # Check if basic configuration is set.
+        if [i for i in [self.model_init_date,self.forecast_system,self.model_init_hour] if i is None]:
+            raise RuntimeError('Error expanding configuration. The basic configuration was not set.')
+        # Set the grib path using defined init date/time/forecast system.
+        # Grib storage paradigm: /GRIB/<date>/<system>/<hour>/*.grib2
+        self.grib_path = '%s/%s/%s/%s' % (Config.GRIB_STORAGE_PATH,self.model_init_date,self.forecast_system,self.model_init_hour)
+        # Model forecast interval depends on the model in use SREF: 3, GEFS: 6.
+        self.model_fcst_interval = 3 if self.forecast_system == 'sref' else 6
+        # Model forecast length depends on the model in use SREF: 87, GEFS: 240.
+        self.model_fcst_length = 87 if self.forecast_system == 'sref' else 240
+        # Number of forecasts in the model run is a function of the forecast
+        #  interval and the forecast length.
+        self.num_forecasts = (self.model_fcst_length + self.model_fcst_interval) / self.model_fcst_interval
+        # Model init time and date can be put into a datetime object. This will
+        #  make it easy to create text for graphics and directory structures by
+        #  using strftime. Ref: https://docs.python.org/2/library/datetime.html
+        self.model_init_dt = datetime.strptime(self.model_init_date + self.model_init_hour,'%Y%m%d%H')
+        return
     #
     def set_forecast_system(self, system):
         """

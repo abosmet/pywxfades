@@ -28,8 +28,8 @@ Manual mode may use command line arguments, or a text-based user interface to
  choose between specific dates, times, forecast systems, data types, etc.
 Initial setup is done, configuration class is initialized with several pieces
  of data, such as the data directory, model run information, etc.
-Station data objects are created for each station.
 Model data objects are created for each data file.
+Station data objects are created for each station.
 Model data files are opened and data are added to station data objects.
 Plumes are plotted once all data are entered.
 Cleanup and possibly transfer graphics to a web server.
