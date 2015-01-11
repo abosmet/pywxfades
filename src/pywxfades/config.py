@@ -4,7 +4,7 @@ Created on Jan 7, 2015
 @author: Joel
 '''
 # Local package from imports
-from pywxfades.manageData import inventory
+from manageData import inventory
 # Standard library from imports
 from datetime import datetime
 # Standard library imports
@@ -110,7 +110,7 @@ class Config:
         """
         # Get available hours from inventory based on current date and forecast
         #  system and sort greatest to least.
-        available_hours = sorted(inventory.get_available_dates(),reverse=True)
+        available_hours = sorted(inventory.get_available_hours(self.model_init_date,self.forecast_system),reverse=True)
         # The latest hour is now the first element (index 0).
         latest_hour = available_hours[0]
         # Set the instance variable.

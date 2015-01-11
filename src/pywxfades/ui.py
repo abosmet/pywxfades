@@ -5,8 +5,8 @@ Created on Jan 7, 2015
 '''
 #
 from glob import glob
-from pywxfades.config import Config
-from pywxfades.manageData import inventory
+from config import Config
+from manageData import inventory
 #
 import os
 #

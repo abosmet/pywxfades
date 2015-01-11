@@ -8,7 +8,7 @@ from glob import glob
 # Standard library imports
 import os
 # Module constants
-GRIB_STORAGE_PATH = '../../../GRIB'
+GRIB_STORAGE_PATH = '../../GRIB'
 # Begin module code.
 def get_available_dates():
     """

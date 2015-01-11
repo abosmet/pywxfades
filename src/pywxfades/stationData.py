@@ -4,7 +4,7 @@ Created on Jan 10, 2015
 @author: Joel
 '''
 #
-from pywxfades.modelData import ModelData
+from modelData import ModelData
 #
 class StationData:
     """

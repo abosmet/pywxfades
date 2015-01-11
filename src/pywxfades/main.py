@@ -5,11 +5,11 @@ Created on Jan 7, 2015
 @author: Joel
 '''
 # Local package imports
-from pywxfades.config import Config
-from pywxfades.manageData import inventory
-from pywxfades.modelData import ModelData
-from pywxfades.stationData import StationData
-from pywxfades import ui
+from config import Config
+from manageData import inventory
+from modelData import ModelData
+from stationData import StationData
+import ui
 # Standard library imports
 import sys
 # Begin module code
@@ -156,7 +156,7 @@ def parse_arguments(config):
             arg_stations_data_file_name = sys.argv[arg_index[0]]
             config.set_stations_data_file(arg_stations_data_file_name)
         else:
-            config.set_stations_data_file(Config.DEFAULT_STATIONS_DATA_FILE_NAME)
+            config.set_stations_data_file_name(Config.DEFAULT_STATIONS_DATA_FILE_NAME)
     return
 #
 def print_help():
