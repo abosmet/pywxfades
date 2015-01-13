@@ -1,0 +1,99 @@
+Organize data first by plume type.
+Organize data next by data name (tp,crain,csnow,cicep,cfrzr,etc)
+Organize data next by model member name
+Organize data next by forecast hour
+
+We can use a dictionary to keep track of indexes. A single dictionary with each
+key will suffice. Time indexes may be generated based on forecast hour divided
+by forecast interval.
+
+Example with single plume, above listed data types, 3 members, 6 forecast hours:
+indexes = {
+			'ptype' : 0,
+			'tp' : 0,
+			'crain' : 1,
+			'csnow' : 2,
+			'cicep' : 3,
+			'cfrzr' : 4,
+			'm1' : 0,
+			'm2' : 1,
+			'm3' : 2
+		  }
+ptype:
+[
+ tp:
+ [
+  m1:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m2:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m3:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+ ]
+ crain:
+ [
+  m1:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m2:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m3:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+ ]
+ csnow:
+ [
+  m1:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m2:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m3:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+ ]
+ cicep:
+ [
+  m1:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m2:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m3:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+ ]
+ cfrzr:
+ [
+  m1:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m2:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+  m3:
+  [
+   t1:[] t2:[] t3:[] t4:[] t5:[] t6:[]
+  ]
+ ]
+]

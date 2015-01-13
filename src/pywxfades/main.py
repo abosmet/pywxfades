@@ -19,7 +19,14 @@ def gen_model_data_objects(config):
     """
     files = inventory.get_data_file_list(config.model_init_date,config.forecast_system,config.model_init_hour)
     for file_ in files:
-        ModelData(file_)
+        new_mdo = ModelData(file_,config)
+        # Add the index for this member to the indexes configuration if it is
+        #  not already there. Define an index for it based on the number of
+        #  member names which have already been defined. The index should be 1
+        #  less than the current number of member names because the member name
+        #  will have been added a moment before this check occurs.
+        if new_mdo.member_name not in config.indexes.keys():
+            config.indexes[new_mdo.member_name] = len(ModelData.member_names) - 1
     return
 #
 def gen_station_data_objects(config):
@@ -37,7 +44,7 @@ def gen_station_data_objects(config):
             # Split on whitespace and set local variables.
             (lat,lon,name) = line.split()
             # Create a StationData object.
-            StationData(float(lat),float(lon),name)
+            StationData(float(lat),float(lon),name,config)
             if config.test:
                 print 'New station created! Name: %s Lat: %s Lon: %s' % (name,lat,lon)
     return
@@ -62,6 +69,14 @@ def main():
     gen_model_data_objects(config)
     # Create StationData objects.
     gen_station_data_objects(config)
+    # Loop over ModelData objects and populate data.
+    for model in ModelData.instances:
+        print 'POPULATING'
+        model.populate_data()
+    # Loop over StationData objects and print data. This will change to plot
+    #  data, but this is just a test to ensure working data structure.
+    for station in StationData.instances:
+        print station.data
     # TODO: To Be Continued...
     return
 #

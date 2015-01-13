@@ -5,6 +5,7 @@ Created on Jan 7, 2015
 '''
 # Local package from imports
 from manageData import inventory
+from plumes import describe
 # Standard library from imports
 from datetime import datetime
 # Standard library imports
@@ -36,6 +37,10 @@ class Config:
         needs to be changed for expansion to other pressure levels.
      model_init_dt <datetime>
        Datetime object representing the initialization time of the model in use.
+     indexes <dict>
+       Mutable dictionary of indexes for named data (keys). Generated from
+        plume descriptions and ModelData and used for accessing data in
+        StationData objects.
      test <bool>
        Activate test mode for verbose output in certain situations.
     """
@@ -60,8 +65,8 @@ class Config:
         self.model_fcst_interval = None
         self.model_fcst_length = None
         self.num_forecasts = None
-        self.data_types = ['csnow','crain','cicep','cfrzr','tp'] # This could change!
         self.model_init_dt = None
+        self.indexes = {}
         self.test = Config.TEST_MODE
         return
     #
@@ -139,6 +144,17 @@ class Config:
         #  make it easy to create text for graphics and directory structures by
         #  using strftime. Ref: https://docs.python.org/2/library/datetime.html
         self.model_init_dt = datetime.strptime(self.model_init_date + self.model_init_hour,'%Y%m%d%H')
+        # Populate some indexes. These will be used to access particular pieces
+        #  of data in StationData.
+        # TODO: Comments
+        plume_count = 0
+        for plume in describe.PLUMES:
+            self.indexes[plume[0]] = plume_count
+            plume_count += 1
+            data_count = 0
+            for data_type in plume[1]:
+                self.indexes[data_type] = data_count
+                data_count += 1
         return
     #
     def set_forecast_system(self, system):
