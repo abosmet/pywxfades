@@ -92,7 +92,7 @@ def menu(options,title='Menu',desc=None,multi=False):
         split_options = [options[i:i+10] for i in range(0, len(options), 10)]
         # Panel index will be used to keep track of which page of the full menu
         #  the user is on.
-        panel_index = 0
+        panel_index = 1
         # Keep going until an escape input appears or the program is terminated.
         while True:
             # Create a new menu from the subset of options and get input.

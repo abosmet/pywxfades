@@ -8,6 +8,7 @@ Created on Jan 7, 2015
 from config import Config
 from manageData import inventory
 from modelData import ModelData
+from plumes import describe
 from stationData import StationData
 import ui
 # Standard library imports
@@ -71,12 +72,21 @@ def main():
     gen_station_data_objects(config)
     # Loop over ModelData objects and populate data.
     for model in ModelData.instances:
-        print 'POPULATING'
+        print '%s Reading model data file %s/%s.\n\t Model: %s\n\t File: %s' %\
+                (PRETEXT, ModelData.instances.index(model) + 1,
+                 len(ModelData.instances), model.member_name,
+                 model.grib_file_path)
         model.populate_data()
-    # Loop over StationData objects and print data. This will change to plot
-    #  data, but this is just a test to ensure working data structure.
-    for station in StationData.instances:
-        print station.data
+    # Loop over plume definitions and plot plumes for each station.
+    for plume in describe.PLUMES:
+        # Loop over station data objects.
+        for station in StationData.instances:
+            print '%s Plotting %s plume %s/%s for %s, station %s/%s' %\
+                    (PRETEXT, plume[0], describe.PLUMES.index(plume) + 1,
+                     len(describe.PLUMES), station.station_name,
+                     StationData.instances.index(station) + 1,
+                     len(StationData.instances))
+            plume[4](station,config)
     # TODO: To Be Continued...
     return
 #
@@ -169,7 +179,7 @@ def parse_arguments(config):
             #  data file. This must be a .dat file and must exist.
             #  config.set_stations_data_file() will check for validity.
             arg_stations_data_file_name = sys.argv[arg_index[0]]
-            config.set_stations_data_file(arg_stations_data_file_name)
+            config.set_stations_data_file_name(arg_stations_data_file_name)
         else:
             config.set_stations_data_file_name(Config.DEFAULT_STATIONS_DATA_FILE_NAME)
     return

@@ -46,6 +46,7 @@ class Config:
     """
     GRIB_STORAGE_PATH = '../../GRIB'
     STATIONS_DATA_STORAGE_PATH = '../../config'
+    OUTPUT_PATH = '../../output'
     DEFAULT_STATIONS_DATA_FILE_NAME = 'paStations.dat'
     TEST_MODE = False
     #
