@@ -89,8 +89,6 @@ def plot(sdo,config):
             prev_color = color
             # Add the forecast precipitation to the cumulative total precip.
             cum_amt += data[config.indexes['tp']][mdl][tm]
-            # TODELETE: Display debug text.
-            print '[ptype] time: %s cum_amt: %s' % (tm,cum_amt)
             # Do not plot a plume line on the initialization.
             if tm != 0:
                 # Set the line color based on precipitation type.
@@ -104,7 +102,11 @@ def plot(sdo,config):
                     color = COLORS['FZRA']
                 else:
                     color = prev_color
-                plt.plot([tm-1,tm],[prev_cum_amt,cum_amt],color)
+                # Plot line from previous time to current time, previous
+                #  accumulation to current accumulation, and color based on
+                #  precipitation type at the current time.
+                plt.plot([tm-1,tm],[prev_cum_amt,cum_amt],color=color)
+        # Plot hourly precipitation (silver lines).
         plt.plot(data[config.indexes['tp']][mdl],COLORS['hourly'],lw=0.25,marker='o',markersize=2)
     plt.ylabel('Precipitation(in)')
     # Create output directories if they don't exist.

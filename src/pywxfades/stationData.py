@@ -85,7 +85,7 @@ class StationData:
         Add data to memory for this station.
         """
         value = message.values[self.grib_i, self.grib_j]
-        fcst_time = message.forecastTime
+        fcst_time = message.endStep
         fcst_index = fcst_time / self.config.model_fcst_interval
         parameter = message.shortName
         # Extra processing needed if data is precipitation amount.
