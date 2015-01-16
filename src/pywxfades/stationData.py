@@ -103,8 +103,12 @@ class StationData:
                 if value < 0.001 and value > 0.0:
                     value = 0
                     print 'Warning: Tiny value in precipitation data: %s %s time %s val %s\n' % (model,parameter,str(fcst_index + 1), str(value))
+            else:
+                # Return without entering data into memory. See line 93.
+                return
         # Set the data value in station memory.
         self.data[self.config.indexes[plume]][self.config.indexes[parameter]][self.config.indexes[model]][fcst_index] = value
+        return
     #
     @staticmethod
     def populate_grid_information(message,config):

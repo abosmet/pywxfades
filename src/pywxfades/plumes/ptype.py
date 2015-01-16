@@ -89,10 +89,8 @@ def plot(sdo,config):
             prev_color = color
             # Add the forecast precipitation to the cumulative total precip.
             cum_amt += data[config.indexes['tp']][mdl][tm]
-            # Set all initialization totals to 0.
-            if tm == 0:
-                cum_amt = 0.0
-                data[config.indexes['tp']][mdl][tm] = 0.0
+            # TODELETE: Display debug text.
+            print '[ptype] time: %s cum_amt: %s' % (tm,cum_amt)
             # Do not plot a plume line on the initialization.
             if tm != 0:
                 # Set the line color based on precipitation type.
