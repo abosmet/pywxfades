@@ -147,13 +147,18 @@ class Config:
         self.model_init_dt = datetime.strptime(self.model_init_date + self.model_init_hour,'%Y%m%d%H')
         # Populate some indexes. These will be used to access particular pieces
         #  of data in StationData.
-        # TODO: Comments
+        # Plume count is used to define indexes for plume types.
         plume_count = 0
+        # Loop over plume descriptions.
         for plume in describe.PLUMES:
+            # Plume type index.
             self.indexes[plume[0]] = plume_count
             plume_count += 1
+            # Data count is used to define indexes for data types.
             data_count = 0
+            # Loop over data types in the current plume description.
             for data_type in plume[1]:
+                # Data type index.
                 self.indexes[data_type] = data_count
                 data_count += 1
         return

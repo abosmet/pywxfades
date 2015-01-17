@@ -7,6 +7,10 @@ We can use a dictionary to keep track of indexes. A single dictionary with each
 key will suffice. Time indexes may be generated based on forecast hour divided
 by forecast interval.
 
+Creating statistics will involve mutliplying all categorical precipitation types
+by the total precipitation at that hour, then summing the values across all
+forecast times.
+
 Example with single plume, above listed data types, 3 members, 6 forecast hours:
 indexes = {
 			'ptype' : 0,

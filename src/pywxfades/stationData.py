@@ -12,6 +12,8 @@ import plumes
 import numpy
 import pygrib #@UnresolvedImport @UnusedImport pygrib not available in windows.
 #
+import math
+#
 class StationData:
     """
     This class will manage data and static information about each station.
@@ -76,7 +78,7 @@ class StationData:
                         else:
                             self.data[self.config.indexes[plume_name]][self.config.indexes[data_type]][self.config.indexes[model]].append(0)
         # Convert to a powerful numpy array.
-        self.data = numpy.array(self.data)
+        self.data = numpy.array(self.data, dtype='float')
         # Add this object to the list of StationData objects.
         StationData.instances.append(self)
     #
@@ -109,6 +111,30 @@ class StationData:
         # Set the data value in station memory.
         self.data[self.config.indexes[plume]][self.config.indexes[parameter]][self.config.indexes[model]][fcst_index] = value
         return
+    #
+    def get_dist_to_nearest_grid_point(self):
+        """
+        Returns the distance to the nearest grid point in kilometers.
+        Inputs:
+            No physical inputs.
+        Outputs:
+            km_dist <float>
+             Distance to the nearest grid point as stored in the object.
+        """
+        # Constant earth's radius
+        EARTH_RADIUS = 6371 # km
+        # Lat/Lon variables converted to radians
+        lat1 = self.latitude * (math.pi / 180)
+        lat2 = self.grib_lat * (math.pi / 180)
+        lon1 = (self.longitude - 360) * (math.pi / 180)
+        lon2 = (self.grib_lon - 360) * (math.pi / 180)
+        # Calculate radian distance and multiply by earth's radius.
+        rad_dist = 2 * math.asin(math.sqrt((math.sin((lat1 - lat2) / 2)) ** 2 +\
+                                           math.cos(lat1) * math.cos(lat2) *\
+                                           (math.sin((lon1 - lon2) / 2)) ** 2))
+        km_dist = rad_dist * EARTH_RADIUS
+        # Return distance in km.
+        return km_dist
     #
     @staticmethod
     def populate_grid_information(message,config):
