@@ -6,7 +6,7 @@ Created on Jan 7, 2015
 #
 from glob import glob
 from config import Config
-from manageData import inventory
+from manageData import localInventory
 #
 import os
 #
@@ -42,53 +42,23 @@ def display_menu(options,title='Menu',desc=None,multi=False):
     print "Enter the number of your selection, or enter 'e' to quit."
     return
 #
-def get_date_input(config):
+def get_run_input():
     """
-    Finds available dates and presents a menu for the user to make a selection.
-    Returns the selected option.
+    Create a menu from available model runs stored locally.
     Inputs:
-        config <Config> Config object containing runtime variables.
+        No physical inputs.
     Outputs:
-        selection <string> The selected date.
+        selection <string>
+         Path of selected model run.
     """
-    available_dates = inventory.get_available_dates()
-    # Create a menu from the available dates options defined above and get user
-    #  input. User input will be returned as an index to one of the options.
-    option_index = menu(available_dates,title='Please select a date.')
-    # Return the selection using the index input by the user.
-    return available_dates[option_index]
-#
-def get_efs_input(config):
-    """
-    Finds available forecast systems for the date in stored in config. Presents
-     a menu for the user to make a selection. Returns the selected option.
-    Inputs:
-        config <Config> Config object containing runtime variables.
-    Outputs:
-        selection <string> The selected forecast system.
-    """
-    available_efs_systems =\
-        inventory.get_available_efs_systems(config.model_init_date)
+    runs = localInventory.available_runs
+    options = [i[1] for i in runs]
     # Get user input and return selected option.
-    option_index = menu(available_efs_systems,
-                        title = 'Please select a forecast system.')
-    return available_efs_systems[option_index]
-#
-def get_hour_input(config):
-    """
-    Finds available initialization times given the date and forecast system
-     stored in config. Presents a menu for the user to make a selection.
-     Returns the selected forecast initialization time.
-    Inputs:
-        config <Config> Config object containing runtime variables.
-    Outputs:
-        selection <string> The selected initialization time.
-    """
-    available_hours = inventory.get_available_hours(config.model_init_date,
-                                                    config.forecast_system)
-    # Get user input and return selected option.
-    option_index = menu(available_hours,title='Please select a forecast hour.')
-    return available_hours[option_index]
+    option_index = menu(options, title = 'Please select a model run.',
+                        desc = ' : Date\t\tHour\tSystem\tFiles\n : Ref: SREF: '\
+                        '21 Files, GEFS: 943 or 1495 Files.')
+    print 'Selected model run:\n\t%s' % (runs[option_index][1])
+    return runs[option_index][0]
 #
 def get_stations_data_file_input(config):
     """
@@ -186,18 +156,13 @@ def show(config):
     Outputs:
         No physical outputs. Initializes the Config object.
     """
-    # Get the date input and set config.
-    input_date = get_date_input(config)
-    print 'Selected date:',input_date
-    config.set_init_date(input_date)
-    # Get the EFS system input and set config.
-    input_forecast_system = get_efs_input(config)
-    print 'Selected forecast system:',input_forecast_system
-    config.set_forecast_system(input_forecast_system)
-    # Get the initialization time input and set config.
-    input_init_time = get_hour_input(config)
-    print 'Selected time:',input_init_time
-    config.set_init_hour(input_init_time)
+    # Get user's model run selection.
+    input_path = get_run_input()
+    # Set configuration using the selected path split at each folder.
+    split_path = input_path.split('/')
+    config.set_init_date(split_path[-3])
+    config.set_forecast_system(split_path[-2])
+    config.set_init_hour(split_path[-1])
     # Placeholder for plume type selection
     #
     #
@@ -205,7 +170,6 @@ def show(config):
     input_stations_data_file_name = get_stations_data_file_input(config)
     print 'Selected stations data file:',input_stations_data_file_name
     config.set_stations_data_file_name(input_stations_data_file_name)
-    config.expand()
     return
 #
 if __name__ == '__main__':

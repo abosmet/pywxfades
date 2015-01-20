@@ -206,7 +206,7 @@ def plot(sdo,config):
                        'km' % (sdo.station_name, sdo.latitude,
                                sdo.longitude - 360, sdo.grib_lat,
                                sdo.grib_lon - 360,
-                               sdo.get_grid_point_distance())
+                               sdo.get_dist_to_nearest_grid_point())
     else:
         raise RuntimeError('%s Error: Invalid EFS system! The system was: %s'\
                            % (PRETEXT,config.forecast_system))

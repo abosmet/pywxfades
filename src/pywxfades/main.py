@@ -6,19 +6,39 @@ Created on Jan 7, 2015
 '''
 # Local package imports
 from config import Config
-from manageData import inventory
+from manageData import localInventory
 from modelData import ModelData
 from plumes import describe
 from stationData import StationData
 import ui
 # Standard library imports
+import re
 import sys
 # Begin module code
 def gen_model_data_objects(config):
     """
     Creates ModelData objects from a list of grib files.
     """
-    files = inventory.get_data_file_list(config.model_init_date,config.forecast_system,config.model_init_hour)
+    # Get a list of all files present at the specified directory.
+    unfiltered_files = localInventory.get_data_file_list(config.model_init_date,
+                                              config.forecast_system,
+                                              config.model_init_hour)
+    files = []
+    # GEFS files require some filtering. TODO: Filter on download.
+    if config.forecast_system == 'gefs':
+        # Repopulate list of files, filtering out unwanted files.
+        for file_ in unfiltered_files:
+            if re.search('geavg|gespr',file_) is not None:
+                pass
+            elif re.search('af(\d{2,3})',file_).groups()[0] == '00':
+                pass
+            elif int(re.search('af(\d{2,3})',file_).groups()[0]) > 240:
+                pass
+            else:
+                files.append(file_)
+    else:
+        files = unfiltered_files
+    # Loop over valid files and create ModelData objects.
     for file_ in files:
         new_mdo = ModelData(file_,config)
         # Add the index for this member to the indexes configuration if it is

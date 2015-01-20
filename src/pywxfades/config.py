@@ -4,7 +4,7 @@ Created on Jan 7, 2015
 @author: Joel
 '''
 # Local package from imports
-from manageData import inventory
+from manageData import localInventory
 from plumes import describe
 # Standard library from imports
 from datetime import datetime
@@ -82,9 +82,11 @@ class Config:
         Outputs:
             No physical outputs. Sets an instance variable.
         """
-        # Get available systems from inventory based on instance variable date
-        #  and sort reverse alphabetically.
-        available_systems = sorted(inventory.get_available_efs_systems(self.model_init_date),reverse=True)
+        # Get available systems from localInventory based on instance variable
+        #  date and sort reverse alphabetically.
+        available_systems =\
+            sorted(localInventory.\
+                   get_available_efs_systems(self.model_init_date),reverse=True)
         # SREF will be now be the first element of this list, index 0.
         system = available_systems[0]
         # Set the instance variable.
@@ -100,8 +102,9 @@ class Config:
         Outputs:
             No physical outputs. Sets an instance variable.
         """
-        # Get available dates from inventory and sort greatest to least.
-        available_dates = sorted(inventory.get_available_dates(),reverse=True)
+        # Get available dates from localInventory and sort greatest to least.
+        available_dates =\
+            sorted(localInventory.get_available_dates(),reverse=True)
         # The latest date is now the first element (index 0).
         latest_date = available_dates[0]
         # Set the instance variable.
@@ -114,9 +117,12 @@ class Config:
          and the current date and forecast system settings. This will raise a
          RuntimeError if the date or forecast system configuration is not set.
         """
-        # Get available hours from inventory based on current date and forecast
-        #  system and sort greatest to least.
-        available_hours = sorted(inventory.get_available_hours(self.model_init_date,self.forecast_system),reverse=True)
+        # Get available hours from localInventory based on current date and
+        #  forecast system and sort greatest to least.
+        available_hours =\
+        sorted(localInventory.get_available_hours(self.model_init_date,
+                                                  self.forecast_system),
+               reverse=True)
         # The latest hour is now the first element (index 0).
         latest_hour = available_hours[0]
         # Set the instance variable.
@@ -129,22 +135,31 @@ class Config:
          set before being created.
         """
         # Check if basic configuration is set.
-        if [i for i in [self.model_init_date,self.forecast_system,self.model_init_hour] if i is None]:
-            raise RuntimeError('Error expanding configuration. The basic configuration was not set.')
+        if [i for i in\
+            [self.model_init_date,self.forecast_system,self.model_init_hour] if\
+             i is None]:
+            raise RuntimeError('Error expanding configuration. The basic confi'\
+                               'guration was not set.')
         # Set the grib path using defined init date/time/forecast system.
         # Grib storage paradigm: /GRIB/<date>/<system>/<hour>/*.grib2
-        self.grib_path = '%s/%s/%s/%s' % (Config.GRIB_STORAGE_PATH,self.model_init_date,self.forecast_system,self.model_init_hour)
+        self.grib_path = '%s/%s/%s/%s' % (Config.GRIB_STORAGE_PATH,
+                                          self.model_init_date,
+                                          self.forecast_system,
+                                          self.model_init_hour)
         # Model forecast interval depends on the model in use SREF: 3, GEFS: 6.
         self.model_fcst_interval = 3 if self.forecast_system == 'sref' else 6
         # Model forecast length depends on the model in use SREF: 87, GEFS: 240.
         self.model_fcst_length = 87 if self.forecast_system == 'sref' else 240
         # Number of forecasts in the model run is a function of the forecast
         #  interval and the forecast length.
-        self.num_forecasts = (self.model_fcst_length + self.model_fcst_interval) / self.model_fcst_interval
+        self.num_forecasts = (self.model_fcst_length +\
+                              self.model_fcst_interval) /\
+                              self.model_fcst_interval
         # Model init time and date can be put into a datetime object. This will
         #  make it easy to create text for graphics and directory structures by
         #  using strftime. Ref: https://docs.python.org/2/library/datetime.html
-        self.model_init_dt = datetime.strptime(self.model_init_date + self.model_init_hour,'%Y%m%d%H')
+        self.model_init_dt = datetime.strptime(self.model_init_date +\
+                                               self.model_init_hour,'%Y%m%d%H')
         # Populate some indexes. These will be used to access particular pieces
         #  of data in StationData.
         # Plume count is used to define indexes for plume types.
@@ -172,7 +187,8 @@ class Config:
             No physical outputs. Sets an instance variable.
         """
         # Check for a valid forecast system using regular expression.
-        if re.search('(?:[sS][rR][eE][fF])|(?:[gG][eE][fF][sS])',system) is not None:
+        if re.search('(?:[sS][rR][eE][fF])|(?:[gG][eE][fF][sS])',system) is\
+            not None:
             # Construct the path using the model initialization date.
             system_path = Config.GRIB_STORAGE_PATH + '/' + self.model_init_date
             # Lazy check to see if the directory exists.
@@ -181,10 +197,12 @@ class Config:
                 self.forecast_system = system.lower()
             else:
                 # Stop on directory does not exist.
-                raise IOError('Error: The specified directory was not found. The directory was %s' % (system_path))
+                raise IOError('Error: The specified directory was not found. T'\
+                              'he directory was %s' % (system_path))
         else:
             # Stop on invalid forecast system entry.
-            raise ValueError('Forecast system not recognized! The system was %s' % (system))
+            raise ValueError('Forecast system not recognized! The system was %'\
+                             's' % (system))
         return
     #
     def set_init_date(self, date):
@@ -205,7 +223,8 @@ class Config:
                 self.model_init_date = date
             else:
                 # Stop on directory does not exist.
-                raise IOError('Error: The specified directory was not found. The directory was %s' % (date_path))
+                raise IOError('Error: The specified directory was not found. T'\
+                              'he directory was %s' % (date_path))
         else:
             # Stop on invalid date entry.
             raise ValueError('Date not recognized! The date was %s' % (date))
@@ -221,29 +240,37 @@ class Config:
         """
         # Search for valid hours based on forecast system using regular
         #  expression.
-        if self.forecast_system == 'sref' and re.search('(?:03)|(?:09)|(?:15)|(?:21)',hour) is not None:
+        if self.forecast_system == 'sref' and re.search('(?:03)|(?:09)|(?:15)|'\
+                                                        '(?:21)',hour) is\
+                                                         not None:
             # Construct path based on input and current date and forecast
             #  system.
-            hour_path = Config.GRIB_STORAGE_PATH + '/' + self.model_init_date + '/' + self.forecast_system + '/' + hour
+            hour_path = Config.GRIB_STORAGE_PATH + '/' + self.model_init_date +\
+                '/' + self.forecast_system + '/' + hour
             # Lazy check to see if the directory exists.
             if os.path.exists(hour_path) and os.path.isdir(hour_path):
                 # If it exists and is a directory, set the instance variable.
                 self.model_init_hour = hour
             else:
                 # Stop on directory not found.
-                raise IOError('Error: The specified directory was not found. The directory was %s' % (hour_path))
-        elif self.forecast_system == 'gefs' and re.search('(?:00)|(?:06)|(?:12)|(?:18)',hour) is not None:
+                raise IOError('Error: The specified directory was not found. T'\
+                              'he directory was %s' % (hour_path))
+        elif self.forecast_system == 'gefs' and re.search('(?:00)|(?:06)|(?:12'\
+                                                          ')|(?:18)',hour) is\
+                                                           not None:
             # Same exact code from the above case, but separated for clarity.
             # Construct path based on input and current date and forecast
             #  system.
-            hour_path = Config.GRIB_STORAGE_PATH + '/' + self.model_init_date + '/' + self.forecast_system + '/' + hour
+            hour_path = Config.GRIB_STORAGE_PATH + '/' + self.model_init_date +\
+                '/' + self.forecast_system + '/' + hour
             # Lazy check to see if the directory exists.
             if os.path.exists(hour_path) and os.path.isdir(hour_path):
                 # If it exists and is a directory, set the instance variable.
                 self.model_init_hour = hour
             else:
                 # Stop on directory not found.
-                raise IOError('Error: The specified directory was not found. The directory was %s' % (hour_path))
+                raise IOError('Error: The specified directory was not found. T'\
+                              'he directory was %s' % (hour_path))
         else:
             # Stop on invalid hour entry.
             raise ValueError('Hour not recognized! The hour was %s' % (hour))
@@ -267,10 +294,12 @@ class Config:
                 self.stations_data_file_name = file_name
             else:
                 # Stop on file not found.
-                raise IOError('Error: The specified file was not found. The file was %s' % (file_path))
+                raise IOError('Error: The specified file was not found. The fi'\
+                              'le was %s' % (file_path))
         else:
             # Stop on input not recognized or improper file type (extension).
-            raise ValueError('Stations Data file name not recognized! The file was %s' % (file_name))
+            raise ValueError('Stations Data file name not recognized! The file'\
+                             ' was %s' % (file_name))
         return
     #
 # End Class Config
