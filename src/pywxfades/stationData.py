@@ -3,18 +3,20 @@ Created on Jan 10, 2015
 
 @author: Joel
 '''
-#
+# Local package from imports
 from config import Config #@UnusedImport Used in __init__()
 from modelData import ModelData
-#
+# Local package imports
 import plumes
-#
+# External library imports
 import numpy
 import pygrib #@UnresolvedImport @UnusedImport pygrib not available in windows.
-#
+# Standard library imports
 import math
-#
-class StationData:
+# Module constants
+PRETEXT = '[StationData]'
+# Begin module code.
+class StationData(object):
     """
     This class will manage data and static information about each station.
     Data storage will be created once it is needed. Storage will be in the form
@@ -50,6 +52,17 @@ class StationData:
         Instantiate the StationData object with the given latitude and
          longitude. Grib coordinates and access indexes will be set when the
          first grib file is opened.
+        Inputs:
+            lat <float>
+             Latitude of the station.
+            lon <float>
+             Longitude of the station.
+            name <string>
+             Name of the station.
+            config <Config>
+             Config object holding current runtime configuration settings.
+        Outputs:
+            Returns a StationData object.
         """
         self.latitude = lat
         self.longitude = lon
@@ -70,13 +83,18 @@ class StationData:
             for data_type in plume[1]:
                 self.data[self.config.indexes[plume_name]].append([])
                 for model in ModelData.member_names:
-                    self.data[self.config.indexes[plume_name]][self.config.indexes[data_type]].append([])
+                    self.data[self.config.indexes[plume_name]]\
+                        [self.config.indexes[data_type]].append([])
                     for time in range(0,config.num_forecasts): #@UnusedVariable
                         # time required for loop syntax.
                         if data_type == 'tp':
-                            self.data[self.config.indexes[plume_name]][self.config.indexes[data_type]][self.config.indexes[model]].append(0.0)
+                            self.data[self.config.indexes[plume_name]]\
+                                [self.config.indexes[data_type]]\
+                                [self.config.indexes[model]].append(0.0)
                         else:
-                            self.data[self.config.indexes[plume_name]][self.config.indexes[data_type]][self.config.indexes[model]].append(0)
+                            self.data[self.config.indexes[plume_name]]\
+                                [self.config.indexes[data_type]]\
+                                [self.config.indexes[model]].append(0)
         # Convert to a powerful numpy array.
         self.data = numpy.array(self.data, dtype='float')
         # Add this object to the list of StationData objects.
@@ -85,6 +103,16 @@ class StationData:
     def add_data(self,plume,model,message):
         """
         Add data to memory for this station.
+        Inputs:
+            plume <string>
+             Plume identifier that this data has been read for. These
+              identifiers should be defined in plumes.describe.
+            model <string>
+             Name of the model that this data comes from.
+            message <pygrib.gribmessage>
+             Grib message object from which to pull data.
+        Outputs:
+            No physical outputs. Sets an instance variable.
         """
         value = message.values[self.grib_i, self.grib_j]
         fcst_time = message.endStep
@@ -93,23 +121,30 @@ class StationData:
         # Extra processing needed if data is precipitation amount.
         if parameter == 'tp':
             # Do not enter total precipitation to forecast hour.
-            if message.endStep - message.startStep == self.config.model_fcst_interval:
+            if message.endStep - message.startStep ==\
+                 self.config.model_fcst_interval:
                 # Convert mm to inches.
                 value = value * 0.0393701
                 # Correct negative values to 0.
                 if value < 0:
                     value = 0
-                    print 'Warning: Negative value in precipitation data: %s %s time %s val %s\n' % (model,parameter,str(fcst_index + 1), str(value))
+                    print '%s Warning: Negative value in precipitation data: %'\
+                          's %s time %s val %s\n' % (PRETEXT, model,parameter,
+                                                     str(fcst_index + 1),
+                                                     str(value))
                 # Remove very small values < 0.001 inches. These pop in from
                 #  time to time due to the conversion from mm to inches.
                 if value < 0.001 and value > 0.0:
                     value = 0
-                    print 'Warning: Tiny value in precipitation data: %s %s time %s val %s\n' % (model,parameter,str(fcst_index + 1), str(value))
+                    print '%s Warning: Tiny value in precipitation data: %s %s'\
+                          ' time %s val %s\n' % (PRETEXT, model, parameter,
+                                              str(fcst_index + 1), str(value))
             else:
                 # Return without entering data into memory. See line 93.
                 return
         # Set the data value in station memory.
-        self.data[self.config.indexes[plume]][self.config.indexes[parameter]][self.config.indexes[model]][fcst_index] = value
+        self.data[self.config.indexes[plume]][self.config.indexes[parameter]]\
+            [self.config.indexes[model]][fcst_index] = value
         return
     #
     def get_dist_to_nearest_grid_point(self):
@@ -153,9 +188,9 @@ class StationData:
         lats,lons = message.latlons()
         # Display information if under test mode.
         if config.test:
-            print 'LATS:'
+            print PRETEXT,'LATS:'
             print lats
-            print 'LONS:'
+            print PRETEXT,'LONS:'
             print lons
         # Loop over StationData objects. Find i and j points and set instance
         #  variables.

@@ -7,6 +7,7 @@ Created on Jan 7, 2015
 # Local package imports
 from config import Config
 from manageData import localInventory
+from manageData import downloadData
 from modelData import ModelData
 from plumes import describe
 from stationData import StationData
@@ -14,17 +15,33 @@ import ui
 # Standard library imports
 import re
 import sys
-# Begin module code
+# Module constants
+PRETEXT = '[PyWxFADES]'
+# Begin module code.
 def gen_model_data_objects(config):
     """
     Creates ModelData objects from a list of grib files.
+    Inputs:
+        config <Config>
+         Config object holding current runtime configuration settings.
+    Outputs:
+        No physical outputs. Creates ModelData objects which may be accessed
+         using the ModelData.instances class variable.
     """
     # Get a list of all files present at the specified directory.
     unfiltered_files = localInventory.get_data_file_list(config.model_init_date,
                                               config.forecast_system,
                                               config.model_init_hour)
+    # If remote files were included and the number of unfiltered files is 0,
+    #  download the data and rerun this function.
+    if len(unfiltered_files) == 0 and [i for i in ['-r','-R'] if i in sys.argv]:
+        downloadData.download_spec(config.model_init_date,
+                                   config.forecast_system,
+                                   config.model_init_hour)
+        gen_model_data_objects(config)
+        return
+    # GEFS files require some filtering.
     files = []
-    # GEFS files require some filtering. TODO: Filter on download.
     if config.forecast_system == 'gefs':
         # Repopulate list of files, filtering out unwanted files.
         for file_ in unfiltered_files:
@@ -47,7 +64,8 @@ def gen_model_data_objects(config):
         #  less than the current number of member names because the member name
         #  will have been added a moment before this check occurs.
         if new_mdo.member_name not in config.indexes.keys():
-            config.indexes[new_mdo.member_name] = len(ModelData.member_names) - 1
+            config.indexes[new_mdo.member_name] = len(ModelData.member_names) -\
+                                                    1
     return
 #
 def gen_station_data_objects(config):
@@ -55,9 +73,16 @@ def gen_station_data_objects(config):
     Reads the stations data file and creates StationData objects for all
      listed stations. Stations data file is formatted as the following:
      <latitude> <longitude> <station name>\n
+    Inputs:
+        config <Config>
+         Config object holding current runtime configuration settings.
+    Outputs:
+        No physical outputs. Creates StationData objects which may be accessed
+         using the StationData.instances class variable.
     """
     # Open the stations data file for the duration of this task.
-    with open(Config.STATIONS_DATA_STORAGE_PATH + '/' + config.stations_data_file_name,'r') as f:
+    with open(Config.STATIONS_DATA_STORAGE_PATH + '/' +\
+              config.stations_data_file_name,'r') as f:
         # Loop over all lines in the stations data file.
         for lines in f:
             # Remove newline and EOF sigils.
@@ -67,14 +92,14 @@ def gen_station_data_objects(config):
             # Create a StationData object.
             StationData(float(lat),float(lon),name,config)
             if config.test:
-                print 'New station created! Name: %s Lat: %s Lon: %s' % (name,lat,lon)
+                print '%s New station created! Name: %s Lat: %s Lon: %s' %\
+                    (PRETEXT, name,lat,lon)
     return
 #
 def main():
     """
     Entry point of program.
     """
-    PRETEXT = '[Plumes]'
     print '%s Initializing. . .' % (PRETEXT)
     # Define a configuration object.
     config = Config('')
@@ -107,12 +132,10 @@ def main():
                      StationData.instances.index(station) + 1,
                      len(StationData.instances))
             plume[4](station,config)
-    # TODO: To Be Continued...
     return
 #
 def parse_arguments(config):
     """
-    Abstracted from main() as this is one complete thought.
     Reads and processes command line arguments.
     Should be able to process the following:
     -Date in the form YYYYMMDD, probably delimited by -d or -D
@@ -127,6 +150,12 @@ def parse_arguments(config):
       and command line arguments for the user to use.
     -UI in the form -ui or -UI. This will present the user with menus to pick
       an available date, time, model, station data file and graphic type.
+    Inputs:
+        config <Config>
+         Config object holding current runtime configuration settings.
+    Outputs:
+        No physical outputs. Sets a few basic configuration settings in the
+         input Config object.
     """
     #==========================================================================
     # When the user inputs dates, times, etc on the command line, the program
@@ -145,7 +174,8 @@ def parse_arguments(config):
     #==========================================================================
     #
     # Check supplied arguments for help delimiters.
-    if ([i for i in ['help','-help','/help','-HELP','/HELP','?','-?','/?'] if i in sys.argv]):
+    if ([i for i in ['help','-help','/help','-HELP','/HELP','?','-?','/?'] if\
+          i in sys.argv]):
         print_help()
         print 'PYTHON STOP'
         exit()
@@ -166,7 +196,8 @@ def parse_arguments(config):
         #======================================================================
         #
         # Date argument check.
-        arg_index = [(sys.argv.index(i) + 1) for i in ['-d','-D'] if i in sys.argv]
+        arg_index = [(sys.argv.index(i) + 1) for i in ['-d','-D'] if\
+                      i in sys.argv]
         if arg_index:
             # If this argument is set, the next argument should be a date.
             # config.set_init_date() will check for validity.
@@ -175,7 +206,8 @@ def parse_arguments(config):
         else:
             config.set_default_init_date()
         # Forecast system argument check.
-        arg_index = [(sys.argv.index(i) + 1) for i in ['-m','-M'] if i in sys.argv]
+        arg_index = [(sys.argv.index(i) + 1) for i in ['-m','-M'] if\
+                      i in sys.argv]
         if arg_index:
             # If this argument is set, the next argument should be a forecast
             #  system. config.set_forecast_system() will check for validity.
@@ -184,7 +216,8 @@ def parse_arguments(config):
         else:
             config.set_default_forecast_system()
         # Hour argument check.
-        arg_index = [(sys.argv.index(i) + 1) for i in ['-h','-H'] if i in sys.argv]
+        arg_index = [(sys.argv.index(i) + 1) for i in ['-h','-H'] if\
+                      i in sys.argv]
         if arg_index:
             # If this argument is set, the next argument should be a hour.
             #  config.set_init_hour() will check for validity.
@@ -193,7 +226,8 @@ def parse_arguments(config):
         else:
             config.set_default_init_hour()
         # Stations data file argument check.
-        arg_index = [(sys.argv.index(i) + 1) for i in ['-s','-S'] if i in sys.argv]
+        arg_index = [(sys.argv.index(i) + 1) for i in ['-s','-S'] if\
+                      i in sys.argv]
         if arg_index:
             # If this argument is set, the next argument should be a stations
             #  data file. This must be a .dat file and must exist.
@@ -201,14 +235,19 @@ def parse_arguments(config):
             arg_stations_data_file_name = sys.argv[arg_index[0]]
             config.set_stations_data_file_name(arg_stations_data_file_name)
         else:
-            config.set_stations_data_file_name(Config.DEFAULT_STATIONS_DATA_FILE_NAME)
+            config.set_stations_data_file_name(\
+                Config.DEFAULT_STATIONS_DATA_FILE_NAME)
     return
 #
 def print_help():
     """
     Prints the help dialogue to the terminal.
+    Inputs:
+        No physical inputs.
+    Outputs:
+        No physical outputs. Outputs text to the terminal.
     """
-    print '[Plumes]'
+    print PRETEXT
     print 'Syntax:'
     print '\t./main.py [option] [argument] ...'
     print 'Description:'
@@ -225,6 +264,8 @@ def print_help():
     print '\t\tSpecify a stations data file, *.dat\n'
     print '\t-?, -help, -HELP'
     print '\t\tDisplay this dialogue.\n'
+    print '\t-r, -R'
+    print '\t\tInclude model runs on NCEP servers.'
     print '\t-ui, -UI'
     print '\t\tRequest a user interface to make selections'
     print '\t\tfrom available data.'
@@ -232,9 +273,14 @@ def print_help():
 #
 def user_interface(config):
     """
-    This function will produce a user interface allowing selections to be made.
-    A huge amount of code will be going in here and possibly an entire package.
-    This will make use of several data inventory functions.
+    Produce a user interface to select a model run, plumes, and a stations data
+     file.
+    Inputs:
+        config <Config>
+        Config object holding current runtime configuration settings.
+    Outputs:
+        No physical outputs. Sets a few basic configuration settings in the
+         input Config object.
     """
     ui.show(config)
     return

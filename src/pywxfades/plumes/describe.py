@@ -3,8 +3,9 @@ Created on Jan 11, 2015
 
 @author: Joel
 '''
-#
+# Local package imports
 import ptype
+# Begin module code.
 #
 #==============================================================================
 # List plume configurations here.
@@ -26,9 +27,18 @@ import ptype
 #  plot method: <function>
 #   Function to be used to plot the plume. Can be called with tuple[4](args)
 #==============================================================================
-PLUMES = [('Precip-Type', ['tp', 'crain', 'cicep', 'cfrzr', 'csnow'], 'surface', 0, ptype.plot)\
-                                      ]
 #
+# Define plumes in this list.
+PLUMES = [\
+          ('Precip-Type', ['tp', 'crain', 'cicep', 'cfrzr', 'csnow'], 'surface',
+           0, ptype.plot)\
+]
+# End module code.
 if __name__ == '__main__':
     print 'describe.py is not designed to be run independently.'
     print 'PYTHON STOP'
+#
+#
+#
+#
+# EOF

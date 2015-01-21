@@ -15,6 +15,10 @@ available_runs = []
 def gen_available_runs():
     """
     Uses glob to find available model runs in the grib storage directory.
+    Inputs:
+        No physical inputs.
+    Outputs:
+        No physical outputs. Sets a module-level variable.
     """
     # Get a list of all directories matching the storage pattern.
     folders = glob(GRIB_STORAGE_PATH + '/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0'\
@@ -30,11 +34,11 @@ def gen_available_runs():
         elif system == 'gefs':
             num_files = len(glob('{0}/*.pgrb2*'.format(path)))
         else:
-            raise RuntimeError('Invalid system in new LocalFolder object! The '\
-                               'system was: %s' % (system))
-        desc = '{0}-{1}-{2}\t{3}Z\t{4}\t{5}'.format(date_str[0:4], date_str[4:6],
-                                                   date_str[6:8], hour_str,
-                                                   system, num_files)
+            raise RuntimeError('Invalid system in storage directory! The syste'\
+                               'm was: %s' % (system))
+        desc = '{0}-{2}-{4}\t{5}Z\t{1}\t{3}'.format(date_str[0:4], system,
+                                                    date_str[4:6], num_files,
+                                                    date_str[6:8], hour_str)
         run = (path,desc)
         available_runs.append(run)
     return
@@ -99,15 +103,18 @@ def get_data_file_list(date,system,hour):
     """
     # Find items living in the specified directory and return a list of paths.
     if system == 'sref':
-        files = glob(GRIB_STORAGE_PATH + '/' + date + '/' + system + '/' + hour + '/*.grib2')
+        files = glob(GRIB_STORAGE_PATH + '/' + date + '/' + system + '/' +\
+                      hour + '/*.grib2')
     elif system == 'gefs':
-        files = glob(GRIB_STORAGE_PATH + '/' + date + '/' + system + '/' + hour + '/*.pgrb2*')
+        files = glob(GRIB_STORAGE_PATH + '/' + date + '/' + system + '/' +\
+                      hour + '/*.pgrb2*')
     else:
-        raise RuntimeError('Invalid system specified. The system was: %s' % (system))
+        raise RuntimeError('Invalid system specified. The system was: %s' %\
+                            (system))
     return files
 #
 if __name__ == '__main__':
-    print 'inventory.py is not designed to be run independently.'
+    print 'localInventory.py is not designed to be run independently.'
     print 'PYTHON STOP'
 #
 #

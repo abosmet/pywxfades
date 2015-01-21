@@ -5,14 +5,15 @@ Created on Jan 7, 2015
 '''
 # Local package from imports
 from manageData import localInventory
+from manageData import remoteInventory
 from plumes import describe
 # Standard library from imports
 from datetime import datetime
 # Standard library imports
 import os
 import re
-#
-class Config:
+# Begin module code.
+class Config(object):
     """
     Class to hold runtime configuration settings.
     Instance Variables:
@@ -50,10 +51,14 @@ class Config:
     DEFAULT_STATIONS_DATA_FILE_NAME = 'paStations.dat'
     TEST_MODE = False
     #
-    def __init__(self, params):
+    def __init__(self):
         """
         Config may be instantiated without setting any fields. This is designed
          to be configured in stages depending on user input (or lack thereof).
+        Inputs:
+            No physical inputs.
+        Outputs:
+            Returns a Config object.
         """
         # Instance variable definitions. These will be assigned later.
         # Basic variables
@@ -86,6 +91,8 @@ class Config:
         #  date and sort reverse alphabetically.
         available_systems =\
             sorted(localInventory.\
+                   get_available_efs_systems(self.model_init_date) +\
+                   remoteInventory.\
                    get_available_efs_systems(self.model_init_date),reverse=True)
         # SREF will be now be the first element of this list, index 0.
         system = available_systems[0]
@@ -104,7 +111,8 @@ class Config:
         """
         # Get available dates from localInventory and sort greatest to least.
         available_dates =\
-            sorted(localInventory.get_available_dates(),reverse=True)
+            sorted(localInventory.get_available_dates() +\
+                   remoteInventory.get_available_dates(),reverse=True)
         # The latest date is now the first element (index 0).
         latest_date = available_dates[0]
         # Set the instance variable.
@@ -116,12 +124,18 @@ class Config:
         Automatically finds the latest available hour based on available data
          and the current date and forecast system settings. This will raise a
          RuntimeError if the date or forecast system configuration is not set.
+        Inputs:
+            No physical inputs.
+        Outputs:
+            No physical outputs. Sets an instance variable.
         """
         # Get available hours from localInventory based on current date and
         #  forecast system and sort greatest to least.
         available_hours =\
         sorted(localInventory.get_available_hours(self.model_init_date,
-                                                  self.forecast_system),
+                                                  self.forecast_system) +\
+               remoteInventory.get_available_hours(self.model_init_date,
+                                                   self.forecast_system),
                reverse=True)
         # The latest hour is now the first element (index 0).
         latest_hour = available_hours[0]
@@ -133,6 +147,10 @@ class Config:
         """
         Expand instance variables which require the basic configuration to be
          set before being created.
+        Inputs:
+            No physical inputs.
+        Outputs:
+            No physical outputs. Sets several instance variables.
         """
         # Check if basic configuration is set.
         if [i for i in\
@@ -305,7 +323,7 @@ class Config:
 # End Class Config
 #
 if __name__ == '__main__':
-    print 'config.py is not designed to be run as a script.'
+    print 'config.py is not designed to be run independently.'
     print 'PYTHON STOP'
 #
 #

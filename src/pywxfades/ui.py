@@ -3,13 +3,17 @@ Created on Jan 7, 2015
 
 @author: Joel
 '''
-#
-from glob import glob
+# Local package from imports
 from config import Config
 from manageData import localInventory
-#
+from manageData import remoteInventory
+# Standard library from imports
+from glob import glob
+# Standard library imports
 import os
-#
+# Module constants
+PRETEXT = '[UI]'
+# Begin module code.
 def display_menu(options,title='Menu',desc=None,multi=False):
     """
     Display a menu with from the given options. Individual options will be
@@ -25,6 +29,8 @@ def display_menu(options,title='Menu',desc=None,multi=False):
          Optional menu description.
         multi <boolean>
          Display panel navigation if set to True. Default False.
+    Outputs:
+        No physical outputs. Prints text to the terminal.
     """
     # Display blank line, then menu title.
     print '\n%s' % (title)
@@ -51,14 +57,22 @@ def get_run_input():
         selection <string>
          Path of selected model run.
     """
-    runs = localInventory.available_runs
-    options = [i[1] for i in runs]
+    runs = localInventory.available_runs + remoteInventory.available_runs
+    options = sorted([i[1] for i in runs], reverse = True)
     # Get user input and return selected option.
     option_index = menu(options, title = 'Please select a model run.',
                         desc = ' : Date\t\tHour\tSystem\tFiles\n : Ref: SREF: '\
                         '21 Files, GEFS: 943 or 1495 Files.')
-    print 'Selected model run:\n\t%s' % (runs[option_index][1])
-    return runs[option_index][0]
+    # Find proper run index given selected option.
+    for run in runs:
+        if run[1] == options[option_index]:
+            run_index = runs.index(run)
+    print '%s Selected model run:\n\t%s' % (PRETEXT, runs[run_index][1])
+    # Create the local directories if a remote model run was selected.
+    if len(runs[run_index]) == 3:
+        if not os.path.exists(runs[run_index][0]):
+            os.makedirs(runs[run_index][0])
+    return runs[run_index][0]
 #
 def get_stations_data_file_input(config):
     """
@@ -117,7 +131,7 @@ def menu(options,title='Menu',desc=None):
             selection = raw_selection
         # User wants to quit.
         if selection in ['e', 'E']:
-            print "Program terminating at user's request."
+            print "%s Program terminating at user's request." % (PRETEXT)
             print 'PYTHON STOP'
             exit()
         # User wants the next page. This can wrap around.
@@ -138,7 +152,7 @@ def menu(options,title='Menu',desc=None):
                 selection = 10
             return (selection - 1) + (10 * panel_index)
         else:
-            print 'Input not recognized, please try again. . .\n'
+            print '%s Input not recognized, please try again. . .\n' % (PRETEXT)
     #
 #
 def show(config):
@@ -168,7 +182,8 @@ def show(config):
     #
     # Get the stations data file input.
     input_stations_data_file_name = get_stations_data_file_input(config)
-    print 'Selected stations data file:',input_stations_data_file_name
+    print '%s Selected stations data file:' % (PRETEXT),\
+        input_stations_data_file_name
     config.set_stations_data_file_name(input_stations_data_file_name)
     return
 #

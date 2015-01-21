@@ -5,7 +5,7 @@ Created on Jan 11, 2015
 '''
 # Local package imports.
 import describe
-# External package imports.
+# External library imports.
 import matplotlib.pyplot as plt
 import numpy
 # Standard library from imports.
@@ -13,8 +13,7 @@ from datetime import datetime #@UnusedImport Needed type only.
 from datetime import timedelta
 # Standard library imports.
 import os
-#
-# Define module constants.
+# Module constants
 COLORS = {'Rain':'g','Snow':'b','FZRA':'r',\
           'Sleet':'c','raw':'#8200dc','hourly':'0.5'}
 PRETEXT = '[PType]'
@@ -85,9 +84,17 @@ def plot(sdo,config):
      point and draw a line between it and the previous forecast's precipitation.
     We need a plot_line function which takes 2 points and a color and draws a
      line between the points in the specified color.
+    Inputs:
+        sdo <StationData>
+         StationData object for which this plume is being plotted.
+        config <Config>
+         Config object holding current runtime configuration settings.
+    Outputs:
+        No physical outputs. Writes an image file to disk.
     """
     # Import StationData/Config only when called to avoid redundancy errors.
-    from stationData import StationData #@UnusedImport Need type only. @UnresolvedImport PyDev issue.
+    from stationData import StationData #@UnusedImport @UnresolvedImport
+    #                                    ^ Need type only,^ Pydev issues
     from config import Config #@UnresolvedImport PyDev issue.
     # Define a few static values from config and station data.
     output_file_path = (Config.OUTPUT_PATH + '/' +

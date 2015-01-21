@@ -3,14 +3,12 @@ Created on Jan 10, 2015
 
 @author: Joel
 '''
-#
+# Local package from imports
 from plumes import describe
-#
-#from stationData import StationData
-#
+# External library imports
 import pygrib #@UnresolvedImport pygrib not available on windows.
-#
-class ModelData:
+#Begin module code.
+class ModelData(object):
     """
     This class will keep track of and manipulate model data files.
     Instance Variables:
@@ -27,6 +25,13 @@ class ModelData:
     def __init__(self,grib,config):
         """
         Instantiate the ModelData object.
+        Inputs:
+            grib <string>
+             Path to the grib file for this ModelData object.
+            config <Config>
+             Config object holding current runtime configuration settings.
+        Outputs:
+            Returns a ModelData object.
         """
         self.grib_file_path = grib
         self.member_name = ModelData.get_member_name_from_path(grib)
@@ -61,7 +66,8 @@ class ModelData:
         elif system == 'gefs':
             member_name = split_file_name[0]
         else:
-            raise RuntimeError('Invalid forecast system! The system was: %s' % (system))
+            raise RuntimeError('Invalid forecast system! The system was: %s' %\
+                                (system))
         return member_name
     #
     def populate_data(self):
@@ -85,11 +91,14 @@ class ModelData:
         grib_file = pygrib.open(self.grib_file_path)
         for req in requirements:
             (plume,data_types,grid_level_type,grid_level,unused) = req
-            selected = grib_file.select(shortName=data_types,typeOfLevel=grid_level_type,level=grid_level)
+            selected = grib_file.select(shortName=data_types,
+                                        typeOfLevel=grid_level_type,
+                                        level=grid_level)
             for message in selected:
                 for sdo in StationData.instances:
                     if sdo.grib_i is None:
-                        StationData.populate_grid_information(message,self.config)
+                        StationData.populate_grid_information(message,
+                                                              self.config)
                     sdo.add_data(plume,self.member_name,message)
         grib_file.close()
         return
