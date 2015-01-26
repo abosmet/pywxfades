@@ -5,6 +5,7 @@ Created on Jan 11, 2015
 '''
 # Local package imports
 import ptype
+import temps
 # Begin module code.
 #
 #==============================================================================
@@ -26,12 +27,18 @@ import ptype
 #    ptype plumes use a level of 0
 #  plot method: <function>
 #   Function to be used to plot the plume. Can be called with tuple[4](args)
+#  Note: For plumes with data across multiple height levels with the same
+#   parameters, please define a separate data request and organize the plotting
+#   routine to accommodate. This requirement is to reduce overall memory usage.
 #==============================================================================
 #
 # Define plumes in this list.
 PLUMES = [\
-          ('Precip-Type', ['tp', 'crain', 'cicep', 'cfrzr', 'csnow'], 'surface',
-           0, ptype.plot)\
+          ('Precip-Type', ['tp', 'crain', 'cicep', 'cfrzr', 'csnow'],
+           'surface', 0, ptype.plot),
+          ('Temp-sfc', ['2t'], 'heightAboveGround', 2, temps.plot),
+          ('Temp-850', ['t'], 'isobaricInhPa', 850, temps.plot_null),
+          ('Temp-700', ['t'], 'isobaricInhPa', 700, temps.plot_null)\
 ]
 # End module code.
 if __name__ == '__main__':

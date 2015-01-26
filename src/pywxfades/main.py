@@ -12,6 +12,9 @@ from modelData import ModelData
 from plumes import describe
 from stationData import StationData
 import ui
+# Standard library from imports
+from datetime import datetime
+from datetime import timedelta #@UnusedImport Need type only.
 # Standard library imports
 import re
 import sys
@@ -100,9 +103,10 @@ def main():
     """
     Entry point of program.
     """
+    start_time = datetime.now()
     print '%s Initializing. . .' % (PRETEXT)
     # Define a configuration object.
-    config = Config('')
+    config = Config()
     # Check for command line arguments, if found, parse them. At least 1
     #  argument must have been entered, the name of this file.
     # This if statement will pass control flow to a subcommand and allow the
@@ -132,6 +136,8 @@ def main():
                      StationData.instances.index(station) + 1,
                      len(StationData.instances))
             plume[4](station,config)
+    print '%s Program complete! Cycle took %s' % (PRETEXT,
+                                                  datetime.now() - start_time)
     return
 #
 def parse_arguments(config):

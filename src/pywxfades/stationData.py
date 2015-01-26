@@ -95,8 +95,10 @@ class StationData(object):
                             self.data[self.config.indexes[plume_name]]\
                                 [self.config.indexes[data_type]]\
                                 [self.config.indexes[model]].append(0)
-        # Convert to a powerful numpy array.
-        self.data = numpy.array(self.data, dtype='float')
+            # Convert to a powerful numpy array.
+            self.data[self.config.indexes[plume_name]] =\
+                numpy.array(self.data[self.config.indexes[plume_name]],
+                            dtype = 'float')
         # Add this object to the list of StationData objects.
         StationData.instances.append(self)
     #
