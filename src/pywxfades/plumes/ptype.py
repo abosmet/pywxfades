@@ -201,22 +201,10 @@ def plot(sdo,config):
     plt.axes([0.25, 0.05, 0.65, 0.1], frameon=False, axisbg='w')
     plt.xticks([]),plt.yticks([])
     # Text is generated slightly differently depending on forecast system.
-    if config.forecast_system == 'sref':
-        station_text = 'Station Data Plot for: %s Coords: %02.02f %02.02f\nNea'\
-                       'rest Point Coords: %02.02f %02.02f, Distance: %02.02f '\
-                       'km' % (sdo.station_name, sdo.latitude, sdo.longitude,
-                               sdo.grib_lat ,sdo.grib_lon,
-                               sdo.get_dist_to_nearest_grid_point())
-    elif config.forecast_system == 'gefs':
-        station_text = 'Station Data Plot for: %s Coords: %02.02f %02.02f\nNea'\
-                       'rest Point Coords: %02.02f %02.02f, Distance: %02.02f '\
-                       'km' % (sdo.station_name, sdo.latitude,
-                               sdo.longitude - 360, sdo.grib_lat,
-                               sdo.grib_lon - 360,
-                               sdo.get_dist_to_nearest_grid_point())
-    else:
-        raise RuntimeError('%s Error: Invalid EFS system! The system was: %s'\
-                           % (PRETEXT,config.forecast_system))
+    station_text = 'Station Data Plot for: %s Coords: %02.02f %02.02f\nNearest'\
+                   ' Point Coords: %02.02f %02.02f, Distance: %02.02f km' %\
+                   (sdo.station_name, sdo.latitude, sdo.longitude, sdo.grib_lat,
+                     sdo.grib_lon, sdo.get_dist_to_nearest_grid_point())
     plt.text(0.6, 0.15, station_text, ha='center', va='center', size=10,
              color='#8200dc')
     # Generate statistics.
