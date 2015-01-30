@@ -5,6 +5,7 @@ Created on Jan 11, 2015
 '''
 # Local package imports
 import ptype
+import thick
 import temps
 # Begin module code.
 #
@@ -38,7 +39,9 @@ PLUMES = [\
            'surface', 0, ptype.plot),
           ('Temp-sfc', ['2t'], 'heightAboveGround', 2, temps.plot),
           ('Temp-850', ['t'], 'isobaricInhPa', 850, temps.plot_null),
-          ('Temp-700', ['t'], 'isobaricInhPa', 700, temps.plot_null)\
+          ('Temp-700', ['t'], 'isobaricInhPa', 700, temps.plot_null),
+          ('Thick-1k', ['gh'], 'isobaricInhPa', 1000, thick.plot),
+          ('Thick-500', ['gh'], 'isobaricInhPa', 500, thick.plot_null)\
 ]
 # End module code.
 if __name__ == '__main__':

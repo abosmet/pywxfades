@@ -7,7 +7,9 @@ Created on Jan 10, 2015
 from plumes import describe
 # External library imports
 import pygrib #@UnresolvedImport pygrib not available on windows.
-#Begin module code.
+# Module constants
+PRETEXT = '[ModelData]'
+# Begin module code.
 class ModelData(object):
     """
     This class will keep track of and manipulate model data files.
@@ -94,7 +96,10 @@ class ModelData(object):
             selected = grib_file.select(shortName=data_types,
                                         typeOfLevel=grid_level_type,
                                         level=grid_level)
-            for message in selected:
+            for i, message in enumerate(selected):
+                if i % 20 == 0:
+                    print '%s %s/%s Grib messages processed for %s' %\
+                            (PRETEXT, i + 1, len(selected), req[0])
                 for sdo in StationData.instances:
                     if sdo.grib_i is None:
                         StationData.populate_grid_information(message,

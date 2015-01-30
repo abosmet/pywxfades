@@ -99,7 +99,7 @@ def plot(sdo,config):
     # Define a few static values from config and station data.
     output_file_path = (Config.OUTPUT_PATH + '/' +
                         config.model_init_dt.strftime('%Y%m%d/%HZ') + '/' +
-                        describe.PLUMES[0][0] + '-' + str(sdo.station_name) +
+                        describe.PLUMES[0][0] + '/' + str(sdo.station_name) +
                         '.png')
     # Grab relevant data.
     data = sdo.data[config.indexes[describe.PLUMES[0][0]]] # COMPLEX
@@ -173,7 +173,7 @@ def plot(sdo,config):
         # Plot hourly precipitation (silver lines).
         plt.plot(data[config.indexes['tp']][mdl],COLORS['hourly'],lw=0.25,
                  marker='o',markersize=2)
-    plt.ylabel('Precipitation(in)')
+    plt.ylabel('Precipitation(in)', color='#8200dc')
     # Define axis limits to QC automatic axis limits.
     max_y = numpy.max(plt.yticks()[0])
     min_y = numpy.min(plt.yticks()[0])
@@ -187,6 +187,8 @@ def plot(sdo,config):
         plt.yticks([0, 5, 10, 15, 20, 25, 30])
         plt.text(15, 15, 'ENTIRE GRID UNDEFINED', ha='center', va='center',
                  size=22, alpha=0.85)
+    # Set the size of the y-axis ticks.
+    plt.yticks(plt.yticks()[0], size=10)
     # Plot the title panel.
     plt.axes([0.25, 0.9, 0.7, 0.1], frameon=False, axisbg='w')
     plt.xticks([]), plt.yticks([])
@@ -200,7 +202,7 @@ def plot(sdo,config):
     # Plot the station information panel.
     plt.axes([0.25, 0.05, 0.65, 0.1], frameon=False, axisbg='w')
     plt.xticks([]),plt.yticks([])
-    # Text is generated slightly differently depending on forecast system.
+    # Generate text based on station.
     station_text = 'Station Data Plot for: %s Coords: %02.02f %02.02f\nNearest'\
                    ' Point Coords: %02.02f %02.02f, Distance: %02.02f km' %\
                    (sdo.station_name, sdo.latitude, sdo.longitude, sdo.grib_lat,

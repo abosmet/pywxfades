@@ -138,6 +138,9 @@ def main():
             plume[4](station,config)
     print '%s Program complete! Cycle took %s' % (PRETEXT,
                                                   datetime.now() - start_time)
+    print '%s Model Run: %s %sZ %s' % (PRETEXT, config.forecast_system,
+                                       config.model_init_hour,
+                                       config.model_init_date)
     return
 #
 def parse_arguments(config):
