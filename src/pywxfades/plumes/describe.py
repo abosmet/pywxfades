@@ -41,6 +41,8 @@ PLUMES = [\
           ('Temp-850', ['t'], 'isobaricInhPa', 850, temps.plot_null),
           ('Temp-700', ['t'], 'isobaricInhPa', 700, temps.plot_null),
           ('Thick-1k', ['gh'], 'isobaricInhPa', 1000, thick.plot),
+          ('Thick-850', ['gh'], 'isobaricInhPa', 850, thick.plot_null),
+          ('Thick-700', ['gh'], 'isobaricInhPa', 700, thick.plot_null),
           ('Thick-500', ['gh'], 'isobaricInhPa', 500, thick.plot_null)\
 ]
 # End module code.

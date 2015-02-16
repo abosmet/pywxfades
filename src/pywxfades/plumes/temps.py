@@ -102,7 +102,7 @@ def plot(sdo,config):
     if 32 < y_max and 32 > y_min:
         plt.plot([0,sfc_data.shape[2] - 1],[32,32],color='r',lw=1)
     # Set the size of the y-axis ticks.
-    plt.yticks(plt.yticks()[0], size=10)
+    #plt.yticks(plt.yticks()[0], size=10)
     # Set the y-axis label.
     plt.ylabel(u'Surface (\u00b0F)', color='#8200dc')
     # Define axis for 850 mb temperatures.
