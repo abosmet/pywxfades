@@ -20,6 +20,8 @@ import re
 import sys
 # Module constants
 PRETEXT = '[PyWxFADES]'
+GEFS_REF_FILES = 861
+SREF_REF_FILES = 21
 # Begin module code.
 def gen_model_data_objects(config):
     """
@@ -35,14 +37,19 @@ def gen_model_data_objects(config):
     unfiltered_files = localInventory.get_data_file_list(config.model_init_date,
                                               config.forecast_system,
                                               config.model_init_hour)
-    # If remote files were included and the number of unfiltered files is 0,
-    #  download the data and rerun this function.
-    if len(unfiltered_files) == 0 and [i for i in ['-r','-R'] if i in sys.argv]:
-        downloadData.download_spec(config.model_init_date,
-                                   config.forecast_system,
-                                   config.model_init_hour)
-        gen_model_data_objects(config)
-        return
+    # If remote files were included, check that the number of local files
+    #  matches reference totals. If not, download the data and run this
+    #  function again.
+    if [i for i in ['-r','-R'] if i in sys.argv]:
+        if (config.forecast_system == 'gefs' and\
+            len(unfiltered_files) < GEFS_REF_FILES) or\
+            (config.forecast_system == 'sref' and\
+             len(unfiltered_files) < SREF_REF_FILES):
+            downloadData.download_spec(config.model_init_date,
+                                       config.forecast_system,
+                                       config.model_init_hour)
+            gen_model_data_objects(config)
+            return
     # GEFS files require some filtering.
     files = []
     if config.forecast_system == 'gefs':

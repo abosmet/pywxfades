@@ -62,7 +62,7 @@ def gen_available_runs():
                                                        date_str[4:6], hour_str,
                                                        date_str[6:8])
         # Create the tuple and add to the list of available runs.
-        run = (local_path, desc, True)
+        run = (local_path, desc)
         available_runs.append(run)
     return
 #

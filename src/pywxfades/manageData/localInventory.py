@@ -39,7 +39,7 @@ def gen_available_runs():
         desc = '{0}-{2}-{4}\t{5}Z\t{1}\t{3}'.format(date_str[0:4], system,
                                                     date_str[4:6], num_files,
                                                     date_str[6:8], hour_str)
-        run = (path,desc)
+        run = (path, desc)
         available_runs.append(run)
     return
 #
